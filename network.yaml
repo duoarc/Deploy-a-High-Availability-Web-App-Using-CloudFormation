@@ -1,20 +1,113 @@
 Parameters:
-# whatever you consider a changing value, put it as a parameter instead of hard-coding it into your script
+
+    EnvironmentName:
+        Description: An environment name that will be prefixed to resource names
+        Type: String
+
+    VpcCIDR: 
+        Description: Please enter the IP range (CIDR notation) for this VPC
+        Type: String
+        Default: 10.0.0.0/16
+
+    PrivateSubnet1CIDR:
+        Description: Please enter the IP range (CIDR notation) for the first private subnet in the first Availability Zone
+        Type: String
+        Default: 10.0.0.0/24
+
+    PrivateSubnet2CIDR:
+        Description: Please enter the IP range (CIDR notation) for the first private subnet in the second Availability Zone
+        Type: String
+        Default: 10.0.1.0/24
+
+    PrivateSubnet3CIDR:
+        Description: Please enter the IP range (CIDR notation) for the second private subnet in the first Availability Zone
+        Type: String
+        Default: 10.0.2.0/24
+
+    PrivateSubnet4CIDR:
+        Description: Please enter the IP range (CIDR notation) for the second private subnet in the second Availability Zone
+        Type: String
+        Default: 10.0.3.0/24
 Resources:
-  #instace profile contains the IAM Role name(s) that we want to associate to our auto scaling EC2 Servers
-  ProfileWithRolesForOurApp:
-    Type: AWS::IAM::InstanceProfile
-    Properties: 
-      Roles:
-        - UdacityS3ReadOnlyEC2
+    VPC: 
+        Type: AWS::EC2::VPC
+        Properties:
+            CidrBlock: !Ref VpcCIDR
+            EnableDnsHostnames: true
+            Tags: 
+                - Key: Name 
+                  Value: !Ref EnvironmentName
+
+    InternetGateway:
+        Type: AWS::EC2::InternetGateway
+        Properties:
+            Tags:
+                - Key: Name
+                  Value: !Ref EnvironmentName
+            
+    InternetGatewayAttachment:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+            InternetGatewayId: !Ref InternetGateway
+            VpcId: !Ref VPC
+
+    PrivateSubnet1: 
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet1CIDR
+            MapPublicIpOnLaunch: false
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} First Private Subnet (AZ1)
+
+    PrivateSubnet2: 
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 1, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet2CIDR
+            MapPublicIpOnLaunch: false
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} First Private Subnet (AZ2)
+
+    PrivateSubnet3: 
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 0, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet3CIDR
+            MapPublicIpOnLaunch: false
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} Second Private Subnet (AZ1)
+
+    PrivateSubnet4: 
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref VPC
+            AvailabilityZone: !Select [ 1, !GetAZs '' ]
+            CidrBlock: !Ref PrivateSubnet4CIDR
+            MapPublicIpOnLaunch: false
+            Tags: 
+                - Key: Name 
+                  Value: !Sub ${EnvironmentName} Second Private Subnet (AZ2)
+    #instace profile contains the IAM Role name(s) that we want to associate to our auto scaling EC2 Servers
+    ProfileWithRolesForOurApp:
+        Type: AWS::IAM::InstanceProfile
+        Properties: 
+            Roles:
+                - UdacityS3ReadOnlyEC2
   
-          #!/bin/bash
-          apt-get update -y
-          apt-get install unzip awscli -y
-          apt-get install apache2 -y
-          systemctl start apache2.service
-          cd /var/www/html
-          aws s3 cp s3://udacity-demo-1/udacity.zip .
-          unzip -o udacity.zip
+                    #!/bin/bash
+                    apt-get update -y
+                    apt-get install unzip awscli -y
+                    apt-get install apache2 -y
+                    systemctl start apache2.service
+                    cd /var/www/html
+                    aws s3 cp s3://udacity-demo-1/udacity.zip .
+                    unzip -o udacity.zip
   Outputs: 
   #Bonus points for useful outputs!
