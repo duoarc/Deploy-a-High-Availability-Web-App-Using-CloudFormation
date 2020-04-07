@@ -150,3 +150,8 @@ Outputs:
     Value: !Join [ "", ["http://", !GetAtt WebAppLB.DNSName]]
     Export:
       Name: !Sub ${EnvironmentName}-Web-LB
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref EC2Instance
+    Export:
+      Name: !Sub ${EnvironmentName}-EC2-Instance-ID
