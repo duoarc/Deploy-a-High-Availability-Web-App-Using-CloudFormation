@@ -3,7 +3,7 @@
 This repository contains templates for deploying a High availability Application using AWS Cloudformation.
 
 
-The infrastructure deployed is described in this [image](https://github.com/duoarc/udcn-Deploy-a-High-Availability-Web-App-Using-CloudFormation/blob/master/UDCN-Project2.jpeg).
+The infrastructure deployed is described in this [image](https://github.com/duoarc/Deploy-a-High-Availability-Web-App-Using-CloudFormation/blob/master/Infrastructure-diagram.jpeg).
 
 The shell script `create.sh` creates a stack in AWS CLI while the `update.sh` script updates the stack with changes.
 
